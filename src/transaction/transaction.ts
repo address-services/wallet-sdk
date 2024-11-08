@@ -31,10 +31,10 @@ function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {
   if (utxo.addressType === AddressType.P2TR || utxo.addressType === AddressType.M44_P2TR) {
     const data = {
       hash: utxo.txid,
-      index: utxo.vout,
+      index: utxo.voutIndex,
       witnessUtxo: {
         value: utxo.satoshis,
-        script: Buffer.from(utxo.scriptPk, 'hex')
+        script: Buffer.from(utxo.scriptPkHex, 'hex')
       },
       tapInternalKey: toXOnly(Buffer.from(utxo.pubkey, 'hex'))
     };
@@ -45,10 +45,10 @@ function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {
   } else if (utxo.addressType === AddressType.P2WPKH || utxo.addressType === AddressType.M44_P2WPKH) {
     const data = {
       hash: utxo.txid,
-      index: utxo.vout,
+      index: utxo.voutIndex,
       witnessUtxo: {
         value: utxo.satoshis,
-        script: Buffer.from(utxo.scriptPk, 'hex')
+        script: Buffer.from(utxo.scriptPkHex, 'hex')
       }
     };
     return {
@@ -59,10 +59,10 @@ function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {
     if (!utxo.rawtx || estimate) {
       const data = {
         hash: utxo.txid,
-        index: utxo.vout,
+        index: utxo.voutIndex,
         witnessUtxo: {
           value: utxo.satoshis,
-          script: Buffer.from(utxo.scriptPk, 'hex')
+          script: Buffer.from(utxo.scriptPkHex, 'hex')
         }
       };
       return {
@@ -72,7 +72,7 @@ function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {
     } else {
       const data = {
         hash: utxo.txid,
-        index: utxo.vout,
+        index: utxo.voutIndex,
         nonWitnessUtxo: Buffer.from(utxo.rawtx, 'hex')
       };
       return {
@@ -86,10 +86,10 @@ function utxoToInput(utxo: UnspentOutput, estimate?: boolean): TxInput {
     });
     const data = {
       hash: utxo.txid,
-      index: utxo.vout,
+      index: utxo.voutIndex,
       witnessUtxo: {
         value: utxo.satoshis,
-        script: Buffer.from(utxo.scriptPk, 'hex')
+        script: Buffer.from(utxo.scriptPkHex, 'hex')
       },
       redeemScript: redeemData.output
     };
@@ -266,7 +266,7 @@ export class Transaction {
     const tx = this.clone();
     tx.utxos.forEach((v) => {
       v.pubkey = estimateWallet.pubkey;
-      v.scriptPk = scriptPk;
+      v.scriptPkHex = scriptPk;
     });
 
     tx.inputs = [];

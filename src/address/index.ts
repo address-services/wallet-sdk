@@ -1,6 +1,7 @@
-import { bitcoin } from '../bitcoin-core';
+import { bip32, bitcoin } from '../bitcoin-core';
 import { NetworkType, toPsbtNetwork } from '../network';
 import { AddressType } from '../types';
+import crypto from 'node:crypto';
 
 /**
  * Convert public key to bitcoin payment object.
@@ -184,4 +185,45 @@ export function scriptPkToAddress(scriptPk: string | Buffer, networkType: Networ
   } catch (e) {
     return '';
   }
+}
+
+/**
+ * Generates a Bitcoin address from an extended public key (xpub) and a derivation path.
+ */
+export function deriveAddressFromXpub(
+  xpub: string,
+  xpubType: string,
+  path: string,
+  networkType: NetworkType = NetworkType.MAINNET
+) {
+  const network = toPsbtNetwork(networkType);
+
+  const xpubNode = bip32.fromBase58(xpub, network);
+  const childNode = xpubNode.derivePath(path);
+  const pubkey = Buffer.from(childNode.publicKey);
+
+  switch (xpubType) {
+    case 'P2PKH':
+      return bitcoin.payments.p2pkh({ pubkey, network }).address;
+    case 'P2SH-P2WPKH':
+      return bitcoin.payments.p2sh({
+        redeem: bitcoin.payments.p2wpkh({ pubkey, network }),
+        network
+      }).address;
+    case 'P2WPKH':
+      return bitcoin.payments.p2wpkh({ pubkey, network }).address;
+    default:
+      throw new Error('Invalid xpubType');
+  }
+}
+
+export function randomizePath(maxChange = 0, maxIndex = 100000) {
+  const change = maxChange === 0 ? 0 : Math.floor(Math.random() * maxChange);
+  const index = Math.floor(Math.random() * maxIndex);
+
+  return `${change}/${index}`;
+}
+
+export function generateSeed() {
+  return crypto.randomBytes(32).toString('hex');
 }

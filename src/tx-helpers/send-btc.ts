@@ -2,7 +2,6 @@ import { UTXO_DUST } from '../constants';
 import { ErrorCodes, WalletUtilsError } from '../error';
 import { NetworkType } from '../network';
 import { Transaction } from '../transaction/transaction';
-import { utxoHelper } from '../transaction/utxo';
 import { ToSignInput, UnspentOutput } from '../types';
 
 export async function sendBTC({
@@ -12,8 +11,7 @@ export async function sendBTC({
   changeAddress,
   feeRate,
   enableRBF = true,
-  memo,
-  memos
+  memo
 }: {
   btcUtxos: UnspentOutput[];
   tos: {
@@ -25,12 +23,7 @@ export async function sendBTC({
   feeRate: number;
   enableRBF?: boolean;
   memo?: string;
-  memos?: string[];
 }) {
-  if (utxoHelper.hasAnyAssets(btcUtxos)) {
-    throw new WalletUtilsError(ErrorCodes.NOT_SAFE_UTXOS);
-  }
-
   const tx = new Transaction();
   tx.setNetworkType(networkType);
   tx.setFeeRate(feeRate);
@@ -46,12 +39,6 @@ export async function sendBTC({
       tx.addOpreturn([Buffer.from(memo, 'hex')]);
     } else {
       tx.addOpreturn([Buffer.from(memo)]);
-    }
-  } else if (memos) {
-    if (Buffer.from(memos[0], 'hex').toString('hex') === memos[0]) {
-      tx.addOpreturn(memos.map((memo) => Buffer.from(memo, 'hex')));
-    } else {
-      tx.addOpreturn(memos.map((memo) => Buffer.from(memo)));
     }
   }
 
@@ -75,10 +62,6 @@ export async function sendAllBTC({
   feeRate: number;
   enableRBF?: boolean;
 }) {
-  if (utxoHelper.hasAnyAssets(btcUtxos)) {
-    throw new WalletUtilsError(ErrorCodes.NOT_SAFE_UTXOS);
-  }
-
   const tx = new Transaction();
   tx.setNetworkType(networkType);
   tx.setFeeRate(feeRate);

@@ -40,6 +40,7 @@
     "@keystonehq/keystone-sdk": "^0.3.0",
     "big-integer": "^1.6.52",
     "bignumber.js": "^9.1.2",
+    "bip32": "5.0.0-rc.0",
     "bip39": "^3.1.0",
     "bitcoinjs-lib": "^6.1.6",
     "bitcore-lib": "^10.0.0",

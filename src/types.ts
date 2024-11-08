@@ -34,27 +34,11 @@ export interface ToSignInput {
 
 export interface UnspentOutput {
   txid: string;
-  vout: number;
   satoshis: number;
-  scriptPk: string;
+  voutIndex: number;
+  scriptPkHex: string;
   pubkey: string;
   addressType: AddressType;
-  inscriptions: {
-    inscriptionId: string;
-    inscriptionNumber?: number;
-    offset: number;
-  }[];
-  atomicals: {
-    atomicalId: string;
-    atomicalNumber: number;
-    type: 'FT' | 'NFT';
-    ticker?: string;
-    atomicalValue?: number;
-  }[];
-  runes?: {
-    runeid: string;
-    amount: string;
-  }[];
   rawtx?: string;
 }
 

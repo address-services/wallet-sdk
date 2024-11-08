@@ -196,29 +196,6 @@ describe('sendBTC', () => {
         expect(data1).eq(data2);
       });
     });
-
-    describe('send with memos', function () {
-      it('allow hex and utf8 ', async function () {
-        const ret1 = await dummySendBTC({
-          wallet: fromWallet,
-          tos: [
-            {
-              address: toWallet.address,
-              satoshis: 1000
-            }
-          ],
-          btcUtxos: [genDummyUtxo(fromWallet, 10000)],
-          feeRate: 1,
-          memos: ['52554e455f54455354', '0083ed9fceff016401']
-          // dump: true,
-        });
-        const data1 = ret1.psbt.txOutputs[1].script.toString('hex');
-        expect(ret1.inputCount).eq(1);
-        expect(ret1.outputCount).eq(3);
-        expectFeeRate(addressType, ret1.feeRate, 1);
-        expect(data1).eq('6a0952554e455f54455354090083ed9fceff016401');
-      });
-    });
   });
 
   describe('P2PKH', function () {
@@ -238,13 +215,11 @@ describe('sendBTC', () => {
         btcUtxos: [
           {
             txid: tx1.getId(),
-            vout: 0,
+            voutIndex: 0,
             satoshis: 5000,
-            scriptPk: wallet_P2PKH.scriptPk,
+            scriptPkHex: wallet_P2PKH.scriptPk,
             addressType: wallet_P2PKH.addressType,
             pubkey: wallet_P2PKH.pubkey,
-            inscriptions: [],
-            atomicals: [],
             rawtx: tx1.toHex()
           }
         ],
